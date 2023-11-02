@@ -1,0 +1,104 @@
+---
+title: "Data_Exploration"
+author: "Frederik Poschenrieder"
+date: "2023-11-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(readr)
+library(dplyr)
+library(rstatix)
+library(ggplot2)
+library(PerformanceAnalytics)
+```
+
+## Data Loading
+
+
+```{r, include=FALSE}
+data <- read_csv("training_data.csv")
+```
+
+# First look
+
+
+```{r}
+head(data)
+```
+
+# Correlation Plots
+
+```{r}
+df_general <- data %>%
+  select(rent_full, area, month, newly_built, quarter_general, rooms,  Micro_rating)
+
+df_ratings <- data %>%
+  select(rent_full, Micro_rating, Micro_rating_NoiseAndEmission, Micro_rating_Accessibility, Micro_rating_DistrictAndArea, Micro_rating_SunAndView, Micro_rating_ServicesAndNature)
+
+df_avg <- data %>%
+  select(rent_full, Anteil_auslaend, anteil_efh, Avg_age, avg_bauperiode, avg_anzhl_geschosse, Avg_size_household)
+
+df_dist <- data %>%
+  select(rent_full, dist_to_4G, dist_to_haltst, dist_to_highway, dist_to_school_1, dist_to_train_stat, restaur_pix_count_km2, superm_pix_count_km2, apoth_pix_count_km2)
+```
+
+```{r}
+df_general %>%
+  cor_mat() %>% 
+  gather(-rowname, key = cor_var, value = r) %>%
+  ggplot(aes(rowname, cor_var, fill = r)) + 
+  geom_tile() +
+  geom_text(aes(label = r)) +
+  theme_minimal()
+
+df_general %>%
+  cor(., use = "complete.obs") %>%
+  chart.Correlation()
+
+df_ratings %>%
+  cor_mat() %>% 
+  gather(-rowname, key = cor_var, value = r) %>%
+  ggplot(aes(rowname, cor_var, fill = r)) + 
+  geom_tile() +
+  geom_text(aes(label = r)) +
+  theme_minimal()
+
+df_ratings %>%
+  cor(., use = "complete.obs") %>%
+  chart.Correlation()
+
+df_avg %>%
+  cor_mat() %>% 
+  gather(-rowname, key = cor_var, value = r) %>%
+  ggplot(aes(rowname, cor_var, fill = r)) + 
+  geom_tile() +
+  geom_text(aes(label = r)) +
+  theme_minimal()
+
+df_avg %>%
+  cor(., use = "complete.obs") %>%
+  chart.Correlation()
+
+df_dist %>%
+  cor_mat() %>% 
+  gather(-rowname, key = cor_var, value = r) %>%
+  ggplot(aes(rowname, cor_var, fill = r)) + 
+  geom_tile() +
+  geom_text(aes(label = r)) +
+  theme_minimal()
+
+df_dist %>%
+  cor(., use = "complete.obs") %>%
+  chart.Correlation()
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
