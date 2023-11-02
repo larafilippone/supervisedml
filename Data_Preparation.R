@@ -20,6 +20,11 @@ data <- data %>%
 
 # adding features to break down the date (eg. published at the start of a month, etc.)
 
-# year build: 
+# year build: figure out featurs (eg Build before 1800)
 
 # additional step: where necessary, change numerical variables to categorical ones
+
+# Checking for duplicates
+
+# 
+
