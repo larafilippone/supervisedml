@@ -119,3 +119,82 @@ data[is.na(data$parking_outside),"parking_outside"] <- 0
 
 data[is.na(data$playground),"playground"] <- 0
 
+# quarter_general and quarter_specific: checking that there aren't any meaningless values.
+
+unique(data$quarter_general)
+unique(data$quarter_specific)
+
+# raised_groundfloor: fill up with 0.
+
+data[is.na(data$raised_groundfloor),"raised_groundfloor"] <- 0
+
+# rent_full
+
+# rooms: replacing NAs with the average household size.
+
+data$rooms <- ifelse(is.na(data$rooms), data$Avg_size_household, data$rooms)
+
+# topstorage: fill up with 0.
+
+data[is.na(data$topstorage),"topstorage"]<-0
+
+# year: checking that everything refers to year 2019.
+
+unique(data$year)
+
+# year_built: checking for unusually old houses.
+
+range(data$year_built, na.rm=T)
+sorted_year_built <- data[order(data$year_built), ]
+head(sorted_year_built$year_built, 20)
+head(sorted_year_built$descr, 20)
+
+# Some descriptions seem to make sense, we could leave this variable as it is.
+
+# Micro_rating: checking the range (should be between 0 and 10).
+
+range(data$Micro_rating, na.rm=T)
+
+# Micro_rating_NoiseAndEmission: checking the range (should be between 0 and 10).
+
+range(data$Micro_rating_NoiseAndEmission, na.rm=T)
+
+# Micro_rating_Accessibility: checking the range (should be between 0 and 10).
+
+range(data$Micro_rating_Accessibility, na.rm=T)
+
+# Micro_rating_DistrictAndArea: checking the range (should be between 0 and 10).
+
+range(data$Micro_rating_DistrictAndArea, na.rm=T)
+
+# Micro_rating_SunAndView: checking the range (should be between 0 and 10).
+
+range(data$Micro_rating_SunAndView, na.rm=T)
+
+# Micro_Rating_ServicesAndNature: checking the range (should be between 0 and 10).
+
+range(data$Micro_rating_ServicesAndNature, na.rm=T)
+
+# wgh_avg_sonnenklasse_per_egid: checking the range. It should refer to solar energy (?).
+
+range(data$wgh_avg_sonnenklasse_per_egid, na.rm=T)
+
+# Anteil_auslaend: checking the range.
+
+range(data$Anteil_auslaend, na.rm=T)
+
+# Avg_age: checking the range.
+
+range(data$Avg_age, na.rm=T)
+
+# Avg_size_household: checking the range. It refers to rooms.
+
+range(data$Avg_size_household, na.rm=T)
+
+# Noise_max: checking the range.
+
+range(data$Noise_max, na.rm=T)
+
+# anteil_efh: checking the range. It refers to percentage of detatched houses.
+
+range(data$anteil_efh, na.rm=T)
