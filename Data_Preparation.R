@@ -198,3 +198,7 @@ range(data$Noise_max, na.rm=T)
 # anteil_efh: checking the range. It refers to percentage of detatched houses.
 
 range(data$anteil_efh, na.rm=T)
+
+# Checking for duplicates: there aren't any.
+duplicates <- duplicated(data)
+print(data[duplicates, ])
