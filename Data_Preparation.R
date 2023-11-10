@@ -128,7 +128,10 @@ unique(data$quarter_specific)
 
 data[is.na(data$raised_groundfloor),"raised_groundfloor"] <- 0
 
-# rent_full
+# rent_full: checking for NAs.
+
+na_rent <- sum(is.na(data$rent_full))
+print(na_rent)
 
 # rooms: replacing NAs with the average household size.
 
