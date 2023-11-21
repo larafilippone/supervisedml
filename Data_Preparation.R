@@ -148,9 +148,15 @@ unique(data$year)
 # year_built: checking for unusually old houses.
 
 range(data$year_built, na.rm=T)
+summary(data$year_built)
 sorted_year_built <- data[order(data$year_built), ]
 head(sorted_year_built$year_built, 20)
 head(sorted_year_built$descr, 20)
+
+# replacing NAs with averages of the neighborhood (avg_bauperiode).
+
+data$year_built <- ifelse(is.na(data$year_built), data$avg_bauperiode, data$year_built)
+summary(data$year_built)
 
 # Some descriptions seem to make sense, we could leave this variable as it is.
 
@@ -201,6 +207,76 @@ range(data$Noise_max, na.rm=T)
 # anteil_efh: checking the range. It refers to percentage of detatched houses.
 
 range(data$anteil_efh, na.rm=T)
+
+# apoth_pix_count_2km: checking the range.
+
+range(data$apoth_pix_count_km2, na.rm=T)
+
+# avg_anzhl_geschosse: checking the range.
+
+range(data$avg_anzhl_geschosse, na.rm=T)
+
+# avg_bauperiode: range is ok, useful when age of construction is missing.
+
+range(data$avg_bauperiode, na.rm=T)
+
+# dist_to_4G: this might be relevant. I am not sure about the unit of measure, but as expected 0 has the highest observed frequency.
+
+range(data$dist_to_4G)
+summary(data$dist_to_4G)
+hist(data$dist_to_4G)
+
+# dist_to_5G: I wouldn't include this var because I don't think 5G is relevant.
+
+range(data$dist_to_5G)
+
+# dist_to_halst: not sure what this variable means.
+
+range(data$dist_to_haltst, na.rm=T)
+summary(data$dist_to_haltst)
+hist(data$dist_to_haltst)
+
+# dist_to_highway: I think these distances are all expressed in meters.
+
+range(data$dist_to_highway)
+
+# dist_to_lake: too many NAs, maybe substitute according to the city. Also, max values aren't accurate.
+
+range(data$dist_to_lake, na.rm = T)
+summary(data$dist_to_lake)
+
+# dist_to_main_stat: not sure if max values are plausible.
+
+range(data$dist_to_main_stat, na.rm = T)
+summary(data$dist_to_main_stat)
+hist(data$dist_to_main_stat)
+
+# dist_to_school_1: this should be ok.
+
+range(data$dist_to_school_1, na.rm=T)
+summary(data$dist_to_school_1)
+
+# dist_to_train_stat: checking range, seems fine.
+
+range(data$dist_to_train_stat)
+summary(data$dist_to_train_stat)
+hist(data$dist_to_train_stat)
+
+# restaur_pix_count_km2: checking range and distribution.
+
+range(data$restaur_pix_count_km2)
+summary(data$restaur_pix_count_km2)
+hist(data$restaur_pix_count_km2)
+
+# superm_pix_count_km2: checking range.
+
+range(data$superm_pix_count_km2)
+
+# dist_to_river: checking range and distribution.
+
+range(data$dist_to_river)
+summary(data$dist_to_river)
+hist(data$dist_to_river)
 
 # Checking for duplicates: there aren't any.
 duplicates <- duplicated(data)
