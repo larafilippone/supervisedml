@@ -3,6 +3,11 @@
 
 library(tidyverse)
 library(readr)
+library(tidyverse)
+library(XML)
+library(httr)
+library(rvest)
+library(stringr)
 
 data <- read_csv("training_data.csv")
 
@@ -119,3 +124,18 @@ data[is.na(data$parking_outside),"parking_outside"] <- 0
 
 data[is.na(data$playground),"playground"] <- 0
 
+
+
+
+
+# datatype conversions
+
+# convert date from chr to date
+
+data$date <- as.Date(data$date, format = "%d.%m.%Y")
+
+
+
+# save data as dataset called "training_data_cleaned.csv" as csv file
+
+#write_csv(data, "training_data_cleaned.csv")
