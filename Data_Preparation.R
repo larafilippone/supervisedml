@@ -90,7 +90,7 @@ data[is.na(data$elevator),"elevator"] <- 0
 
 #floors: fill up with mean
 
-data[is.na(data$floors),"floors"] <- mean(data$floors, na.rm=T)
+data$floors <- ifelse(is.na(data$floors), data$avg_anzhl_geschosse, data$floors)
 
 # furnished: replace NA's with 0
 
@@ -145,8 +145,10 @@ data$rooms <- ifelse(is.na(data$rooms), data$Avg_size_household, data$rooms)
 lmrooms<-lm(data$rent_full~data$rooms)
 stargazer(lmrooms, type="text")
 
-# topstorage: fill up with 0.
+# topstorage: fill up with 0. Not significant.
 data[is.na(data$topstorage),"topstorage"]<-0
+lmstorage<-lm(data$rent_full~data$topstorage)
+stargazer(lmstorage, type="text")
 
 # year: checking that everything refers to year 2019.
 unique(data$year)
@@ -198,6 +200,7 @@ stargazer(lmauslaend, type="text")
 
 # Avg_age: checking the range. Would not include it, no significant impact.
 range(data$Avg_age, na.rm=T)
+summary(data$Avg_age)
 lmage<-lm(data$rent_full~data$Avg_age)
 stargazer(lmage, type="text")
 
@@ -252,11 +255,13 @@ stargazer(lmhigh, type="text")
 # dist_to_lake: too many NAs, maybe substitute according to the city. Also, max values aren't accurate.
 range(data$dist_to_lake, na.rm = T)
 summary(data$dist_to_lake)
-
-# dist_to_main_stat: not sure if max values are plausible. Not sure if NAs are too many.
+data$dist_to_lake <- ifelse(is.na(data$dist_to_lake), mean(data$dist_to_lake, na.rm=T), data$dist_to_lake)
+summary(data$dist_to_lake)
+# dist_to_main_stat: not sure if NAs are too many.
 range(data$dist_to_main_stat, na.rm = T)
 summary(data$dist_to_main_stat)
 hist(data$dist_to_main_stat)
+data$dist_to_main_stat<-ifelse(is.na(data$dist_to_main_stat), mean(data$dist_to_main_stat, na.rm=T)-mean(data$dist_to_train_stat), data$dist_to_main_stat)
 #significant impact on rent-->include this variable.
 lmmain<-lm(data=data, rent_full~dist_to_main_stat)
 stargazer(lmmain, type="text")
@@ -302,3 +307,38 @@ stargazer(lmriver, type="text")
 # Checking for duplicates: there aren't any.
 duplicates <- duplicated(data)
 print(data[duplicates, ])
+
+# feature engeneering frederik
+#rm(list=ls())
+# load dataset training_data_cleaned.csv
+
+#data <- read.csv("training_data_cleaned.csv", sep = ",", header = TRUE)
+
+# add feature area/ rooms
+
+data$area_per_room <- data$area / data$rooms
+
+
+# datatype conversions
+
+# convert date from chr to date
+
+data$date <- as.Date(data$date, format = "%d.%m.%Y")
+
+# add feature on whether date at the beginning or end of the month
+data$date <- as.Date(data$date, format = "%Y-%m-%d")
+
+data$day <- as.numeric(format(data$date, "%d"))
+data$month <- as.numeric(format(data$date, "%m"))
+
+# add feature on the weekday and assign levels from 0 to 7
+
+data$weekday <- as.numeric(format(data$date, "%u"))
+
+# include a variable city_50k with one for all rows where GDNMK is in the vector citylist
+city_list <- c("Zürich", "Genf", "Basel", "Lausanne", "Bern", "Winterthur", "Luzern", "St. Gallen", "Lugano", "Biel/Bienne")
+
+data$city_50k <- ifelse(data$GDENAMK %in% city_list, 1, 0)
+rm(city_list)
+
+#write_csv(data,"training_data_cleaned.csv")
