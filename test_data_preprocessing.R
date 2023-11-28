@@ -606,5 +606,5 @@ data <- select(data, -KTKZ)
 
 #data <- preProcess(data, method = c("center", "scale")) # eg. Normalizing and scaling (means what?
 
-#write_csv(data,"training_data_preprocessed.csv")
+#write_csv(data,"test_data_preprocessed.csv")
 
