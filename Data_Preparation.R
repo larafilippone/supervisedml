@@ -605,7 +605,6 @@ data <- bind_cols(data, dummies_df)
 data <- select(data, -KTKZ)
 
 # normalization of the predictors: this function is for z-score normalization.
-
 #data <- preProcess(data, method = c("center", "scale")) # eg. Normalizing and scaling (means what?
 
 #write_csv(data,"training_data_preprocessed.csv")
