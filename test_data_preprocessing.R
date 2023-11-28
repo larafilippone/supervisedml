@@ -608,3 +608,4 @@ data <- select(data, -KTKZ)
 
 #write_csv(data,"test_data_preprocessed.csv")
 
+
