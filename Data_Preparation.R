@@ -1,6 +1,7 @@
 ## Data preparation
 
-
+library(rstatix)
+library(moments)
 library(tidyverse)
 library(readr)
 library(stargazer)
@@ -18,6 +19,53 @@ data <- data %>%
   -pool, -quiet, -shower, -sunny, -terrace, -veranda, -water) %>% # less than 100 observations without NA`s
   select(-toilets) # nonsense variables
 
+#descriptives
+summary(data$rent_full)
+hist(data$rent_full, main="Distribution of rent_full", xlab="rent", col="lightblue", breaks=30)
+summary(data$rent_full)
+skewness(data$rent_full)
+
+summary(data$area)
+hist(data$area, main="Distribution of area", xlab="area (squared meters)", col="lightblue", breaks=45)
+summary(data$area)
+skewness(data$area)
+
+df_general <- data %>%
+  select(rent_full, area, month, year_built, rooms, Micro_rating, apoth_pix_count_km2,restaur_pix_count_km2,superm_pix_count_km2,
+         wgh_avg_sonnenklasse_per_egid,dist_to_4G,dist_to_highway, dist_to_lake, dist_to_main_stat)
+
+#Pearson's correlation
+#df_general %>%
+  #cor_mat() %>%
+  #gather(-rowname, key = cor_var, value = r) %>%
+  #ggplot(aes(rowname, cor_var, fill = r)) +
+  #geom_tile() +
+  #geom_text(aes(label = round(r, 2)), color = "black", size = 3) +
+  #theme_minimal() +
+  #scale_fill_gradient(low = "lightblue", high = "blue") +
+  #labs(title = "Correlation matrix of the main variables")+ylab("")+xlab("")+
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.4))  # Adjust angle for slant
+
+#Spearman's correlation
+df_general %>%
+  cor(method = "spearman", use = "complete.obs") %>%  # Use complete observations
+  as.data.frame() %>%
+  rownames_to_column(var = "rowname") %>%
+  gather(-rowname, key = cor_var, value = r) %>%
+  ggplot(aes(rowname, cor_var, fill = r)) +
+  geom_tile() +
+  geom_text(aes(label = ifelse(is.na(r), "", round(r, 2))), color = "black", size = 3) +  # Handle NA values in labels
+  theme_minimal() +
+  scale_fill_gradient(low = "lightblue", high = "blue") +
+  labs(title = "Correlation matrix of the main variables", y = "", x = "") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.4))
+
+ggplot(data, aes(x = rent_full, y = area)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(x = "Rent", y = "Area")+ggtitle("Relationship between rent and area")
+
 # Dealing with NA`s
 
 data %>%
@@ -25,6 +73,8 @@ data %>%
   pivot_longer(everything(), names_to = "column", values_to = "na_share") %>%
   filter(na_share>0) %>%
   view()
+
+skewness(data$Avg_size_household)
 
 # area : create averages for room numbers and then fill up for all NA'S and values below 5 sqm
 area_means = data %>% 
@@ -150,6 +200,7 @@ head(sorted_rent$rent_full, 20)
 head(sorted_rent$descr, 20) #descriptions seem to match
 
 # rooms: replacing NAs with mean. Include this variable in models.
+summary(data$rooms)
 data$rooms <- ifelse(is.na(data$rooms), mean(data$rooms,na.rm=T), data$rooms)
 lmrooms<-lm(data$rent_full~data$rooms)
 stargazer(lmrooms, type="text")
