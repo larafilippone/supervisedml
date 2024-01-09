@@ -21,12 +21,12 @@ data <- data %>%
 
 #descriptives
 summary(data$rent_full)
-hist(data$rent_full, main="Distribution of rent_full", xlab="rent", col="lightblue", breaks=30)
+hist(data$rent_full, main="Distribution of rent_full", xlab="monthly rent (CHF)", col="lightblue", breaks=30)
 summary(data$rent_full)
 skewness(data$rent_full)
 
 summary(data$area)
-hist(data$area, main="Distribution of area", xlab="area (squared meters)", col="lightblue", breaks=45)
+hist(data$area, main="Distribution of area", xlab="area (square meters)", col="lightblue", breaks=45)
 summary(data$area)
 skewness(data$area)
 
@@ -46,25 +46,36 @@ df_general <- data %>%
   #labs(title = "Correlation matrix of the main variables")+ylab("")+xlab("")+
   #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.4))  # Adjust angle for slant
 
-#Spearman's correlation
+#Spearman's correlation with new labels (more readable)
+# vector for new labels
+new_labels <- c(rent_full = "Rent", area = "Area", month = "Month", year_built = "Year Built",
+                rooms = "Rooms", Micro_rating = "Micro Rating", apoth_pix_count_km2 = "Pharmacies Count/km²",
+                restaur_pix_count_km2 = "Restaurants Count/km²", superm_pix_count_km2 = "Supermarkets Count/km²",
+                wgh_avg_sonnenklasse_per_egid = "Avg Solar Class", dist_to_4G = "Distance to 4G",
+                dist_to_highway = "Distance to Highway", dist_to_lake = "Distance to Lake",
+                dist_to_main_stat = "Distance to Main Station")
+
+# correlation matrix plot, with more readable names
 df_general %>%
-  cor(method = "spearman", use = "complete.obs") %>%  # Use complete observations
+  cor(method = "spearman", use = "complete.obs") %>%
   as.data.frame() %>%
   rownames_to_column(var = "rowname") %>%
   gather(-rowname, key = cor_var, value = r) %>%
+  mutate(rowname = new_labels[rowname], cor_var = new_labels[cor_var]) %>% # Replace names
   ggplot(aes(rowname, cor_var, fill = r)) +
   geom_tile() +
-  geom_text(aes(label = ifelse(is.na(r), "", round(r, 2))), color = "black", size = 3) +  # Handle NA values in labels
+  geom_text(aes(label = ifelse(is.na(r), "", round(r, 2))), color = "black", size = 3) +
   theme_minimal() +
   scale_fill_gradient(low = "lightblue", high = "blue") +
-  labs(title = "Correlation matrix of the main variables", y = "", x = "") +
+  labs(title = "Correlation matrix of the main numerical variables", y = "", x = "") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0.4))
 
+#plot to show correlation between rent and area.
 ggplot(data, aes(x = rent_full, y = area)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   theme_minimal() +
-  labs(x = "Rent", y = "Area")+ggtitle("Relationship between rent and area")
+  labs(x = "Monthly rent (CHF)", y = "Area (square meters)")+ggtitle("Correlation between rent and area")
 
 # Dealing with NA`s
 
