@@ -220,9 +220,6 @@ stargazer(lmapo, type="text")
 
 # avg_bauperiode: range is ok, useful when age of construction is missing.
 range(data$avg_bauperiode, na.rm=T)
-#imputing missing values using the mean.
-data$avg_bauperiode <- ifelse(is.na(data$avg_bauperiode), mean(data$avg_bauperiode,na.rm=T), data$avg_bauperiode)
-summary(data$avg_bauperiode)
 
 # dist_to_4G: this might be relevant. I am not sure about the unit of measure, but as expected 0 has the highest observed frequency.
 range(data$dist_to_4G)
