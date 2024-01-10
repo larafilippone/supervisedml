@@ -6,6 +6,7 @@ library(tidyverse)
 library(readr)
 library(stargazer)
 library(caret)
+library(VIM)
 
 data <- read_csv("training_data.csv")
 
@@ -341,14 +342,27 @@ nzv <- nearZeroVar(data)
 data <- data[, -nzv]
 
 #knn imputation
+# Set seed for reproducibility
+set.seed(123)
 
-# remove correlated predictors
+# Perform k-NN imputation using the VIM package
+# The k parameter is the number of nearest neighbors to use
+data_imputed <- kNN(data, k = 5)
+
+# Check the dataset to confirm that NAs have been imputed
+sum(is.na(data_imputed))
+
+#remove columns indicating whether values were imputed or not
+data <- data_imputed %>%
+  select(-contains("_imp"))
+
+# remove correlated predictors 
 data_numeric <- data[, -which(names(data) %in% c("GDENAMK", "KTKZ"))]
 correlated_predictors <- findCorrelation(cor(data_numeric), cutoff = 0.85)
 print(correlated_predictors)
-#of course months are correlated with the quarter, I wouldn't worry about it.
+#weird correlation: lat and parking.
 
-# checking for linear dependencies: this means that these variables can be expressed as a linear combination of each other.
+# checking for linear dependencies: this means that these variables can be expressed as a linear combination of each other. THIS IS NOT WORKING BECAUSE OF NAs
 linear_dependencies <- findLinearCombos(data_numeric)
 print(linear_dependencies)
 #It makes sense, because the micro_rating is based on the other subratings. But I don't think this is an issue.
@@ -358,7 +372,7 @@ print(linear_dependencies)
 data <- data %>%
   select(-quarter_specific)
 
-#FOR THE MOMENT, I ALSO DROP "msregion" and "GDENAMK".
+#FOR THE MOMENT, I ALSO DROP "GDENAMK".
 data <- data %>%
   select(-GDENAMK)
 
@@ -373,18 +387,18 @@ data <- bind_cols(data, dummies_df)
 # Remove the column
 data <- select(data, -KTKZ)
 
-#transforming msregion in dummy variables.
+# Convert msregion to a factor variable
+data$msregion <- as.factor(data$msregion)
+
 # Create dummy variables for msregion column
 dummiesms <- model.matrix(~ msregion - 1, data = data)
 dummiesms_df <- as.data.frame(dummiesms)
 
 # Add the dummy variables to the data dataframe
-data <- bind_cols(data, dummiesms_df)
-
-# Remove the column
-data <- select(data, -msregion)
+# Make sure to not overwrite the original msregion column
+data <- bind_cols(data %>% select(-msregion), dummiesms_df)
 
 # normalization of the predictors: this function is for z-score normalization.
 #data <- preProcess(data, method = c("center", "scale")) # eg. Normalizing and scaling (means what?
 
-#write_csv(data,"training_data_preprocessed.csv")
+#write_csv(data,"training_data_preprocessed_knn.csv")
